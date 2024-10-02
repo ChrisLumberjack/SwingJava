@@ -5,6 +5,7 @@
 package gekquin.tarea01cpa;
 
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.util.Date;
 import java.util.regex.Pattern;
 import javax.swing.DefaultComboBoxModel;
@@ -154,6 +155,18 @@ public class Dialogo extends javax.swing.JDialog {
         jTextField7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField7ActionPerformed(evt);
+            }
+        });
+
+        jTextField9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField9ActionPerformed(evt);
+            }
+        });
+
+        jTextField10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField10ActionPerformed(evt);
             }
         });
 
@@ -459,12 +472,22 @@ public class Dialogo extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2MouseClicked
 
     private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseClicked
-       jDialog1.setVisible(false);
+        jDialog1.setVisible(false);
     }//GEN-LAST:event_jButton4MouseClicked
+
+    private void jTextField9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField9ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField9ActionPerformed
+
+    private void jTextField10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField10ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField10ActionPerformed
 
     private void initCustomComponents() {
         ((AbstractDocument) jTextField1.getDocument()).setDocumentFilter(new LimitDocumentFilter(10));
         ((AbstractDocument) jTextField3.getDocument()).setDocumentFilter(new LimitDocumentFilter(15));
+        ((AbstractDocument) jTextField9.getDocument()).setDocumentFilter(new LimitDocumentFilterInt(30000));
+        ((AbstractDocument) jTextField10.getDocument()).setDocumentFilter(new LimitDocumentFilterInt(30000));
         jComboBox2.setVisible(true);
         jComboBox3.setVisible(true);
         jLabel13.setVisible(false);
@@ -585,15 +608,11 @@ public class Dialogo extends javax.swing.JDialog {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Dialogo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Dialogo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Dialogo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Dialogo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        
         //</editor-fold>
 
         /* Create and display the dialog */
@@ -647,12 +666,65 @@ public class Dialogo extends javax.swing.JDialog {
         }
     }
 
+    public class LimitDocumentFilterInt extends DocumentFilter {
+
+        private int limit;
+
+        public LimitDocumentFilterInt(int limit) {
+            this.limit = limit;
+        }
+
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            StringBuilder newValue = new StringBuilder(fb.getDocument().getText(0, fb.getDocument().getLength()));
+            newValue.insert(offset, string);
+
+            if (isWithinLimit(newValue.toString())) {
+                super.insertString(fb, offset, string, attr);
+            } else {
+                Toolkit.getDefaultToolkit().beep(); // Beep to indicate invalid input
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+            StringBuilder newValue = new StringBuilder(fb.getDocument().getText(0, fb.getDocument().getLength()));
+            newValue.replace(offset, offset + length, text);
+
+            if (isWithinLimit(newValue.toString())) {
+                super.replace(fb, offset, length, text, attrs);
+            } else {
+                Toolkit.getDefaultToolkit().beep();
+            }
+        }
+
+        @Override
+        public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
+            StringBuilder newValue = new StringBuilder(fb.getDocument().getText(0, fb.getDocument().getLength()));
+            newValue.delete(offset, offset);
+
+            if (isWithinLimit(newValue.toString())) {
+                super.remove(fb, offset, length);
+            } else {
+                Toolkit.getDefaultToolkit().beep(); 
+            }
+        }
+
+        private boolean isWithinLimit(String text) {
+            try {
+                int value = Integer.parseInt(text);
+                return value <= limit;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+    }
+
     public class JTextFieldLimitExample extends JFrame {
 
         public JTextFieldLimitExample() {
             JTextField jTextField1 = new JTextField(20);
 
-            // Obtener el documento del JTextField y aplicar el filtro de longitud
             AbstractDocument document = (AbstractDocument) jTextField1.getDocument();
             document.setDocumentFilter(new LimitDocumentFilter(10));
 
